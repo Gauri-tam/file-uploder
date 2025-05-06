@@ -23,14 +23,19 @@ if not exist "%JAVA_HOME%\bin\jpackage.exe" (
 REM === Create Output Directory ===
 if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 
+REM === Create Custom Runtime ===
+echo Creating custom runtime...
+"%JAVA_HOME%\bin\jlink" ^
+  --module-path "%JAVA_HOME%\jmods;%JAVAFX_HOME%\lib" ^
+  --add-modules java.base,javafx.controls,javafx.fxml,javafx.graphics ^
+  --output "%OUTPUT_DIR%\runtime"
+
 REM === Run jpackage ===
 echo Creating installer...
 "%JAVA_HOME%\bin\jpackage" ^
-  --runtime-image "%JAVA_HOME%" ^
+  --runtime-image "%OUTPUT_DIR%\runtime" ^
   --dest "%OUTPUT_DIR%" ^
   --name FileUploader ^
-  --module-path "%JAVAFX_HOME%\lib" ^
-  --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base,javafx.web ^
   --input target ^
   --main-jar fileUploader-1.0-SNAPSHOT.jar ^
   --main-class %MAIN_CLASS% ^
