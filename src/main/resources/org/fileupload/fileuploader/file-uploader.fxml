@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.fileupload.fileuploader.FileUploaderController"
+      alignment="CENTER" spacing="15.0" style="-fx-background-color: #f5f7fa;">
+
+    <padding>
+        <Insets top="25.0" right="30.0" bottom="25.0" left="30.0"/>
+    </padding>
+
+    <!-- Header Section -->
+    <Label text="File Uploader" styleClass="header-label">
+        <font>
+            <Font name="System Bold" size="20.0"/>
+        </font>
+    </Label>
+
+    <Separator prefWidth="200.0"/>
+
+    <!-- File Selection Section -->
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Button text="Browse Files" onAction="#handleChooseFileButton"
+                style="-fx-background-color: #4a6baf; -fx-text-fill: white; -fx-font-weight: bold;"/>
+        <Label fx:id="fileLabel" text="No file selected" style="-fx-text-fill: #555;"/>
+    </HBox>
+
+    <!-- File Info Section (visible after selection) -->
+    <GridPane fx:id="fileInfoPane" visible="false" hgap="10" vgap="5">
+        <columnConstraints>
+            <ColumnConstraints hgrow="NEVER" halignment="RIGHT"/>
+            <ColumnConstraints hgrow="ALWAYS"/>
+        </columnConstraints>
+
+        <Label text="File Name:" style="-fx-font-weight: bold;"/>
+        <Label fx:id="fileNameLabel" GridPane.columnIndex="1"/>
+
+        <Label text="File Size:" style="-fx-font-weight: bold;" GridPane.rowIndex="1"/>
+        <Label fx:id="fileSizeLabel" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+        <Label text="File Type:" style="-fx-font-weight: bold;" GridPane.rowIndex="2"/>
+        <Label fx:id="fileTypeLabel" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+    </GridPane>
+
+    <!-- Upload Button -->
+    <Button text="Upload File" onAction="#handleUploadButton"
+            style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 25;"/>
+
+    <!-- Progress Section -->
+    <VBox fx:id="progressBox" visible="false" spacing="5" alignment="CENTER">
+        <ProgressBar fx:id="uploadProgress" prefWidth="300.0"/>
+        <Label fx:id="progressLabel" text="Uploading..." style="-fx-text-fill: #4a6baf;"/>
+    </VBox>
+
+    <!-- Status Section -->
+    <Label fx:id="statusLabel" style="-fx-font-weight: bold; -fx-text-fill: #d32f2f;"/>
+
+    <!-- Footer -->
+    <Separator prefWidth="200.0"/>
+    <Label text="© 2023 File Uploader" style="-fx-text-fill: #888; -fx-font-size: 10px;"/>
+
+    <stylesheets>
+        <URL value="@/styles.css"/>
+    </stylesheets>
+</VBox>
