@@ -12,7 +12,7 @@ public class FileUploader extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(FileUploader.class.getResource("file-uploader.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 600, 300);
+        Scene scene = new Scene(fxmlLoader.load(), 600, 330);
 
         // Get the controller and set the primary stage
         FileUploaderController controller = fxmlLoader.getController();
