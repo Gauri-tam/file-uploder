@@ -3,8 +3,11 @@ package org.fileupload.fileuploader.databaseConnection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class SQLiteConnection {
+
+    private static final Logger logger = Logger.getLogger(SQLiteConnection.class.getName());
 
     private static final String DB_URL = "jdbc:sqlite:fileupload.db";
     private static boolean initialized = false;
@@ -13,7 +16,7 @@ public class SQLiteConnection {
         return DriverManager.getConnection(DB_URL);
     }
 
-    public static synchronized void initializeDatabase() {
+    public static synchronized void initializeDatabase() throws Exception {
         if (initialized) {
             return;
         }
@@ -32,9 +35,8 @@ public class SQLiteConnection {
         try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
             stmt.execute(createTable);
             initialized = true;
-            System.out.println("Database initialized successfully"); // after that we have to see the logs of the file when it is uploaded or having any issue.
+            logger.info("Database initialized successfully");
         } catch (SQLException e) {
-            System.err.println("Database initialization failed: " + e.getMessage());
             throw new RuntimeException("Failed to initialize database", e);
         }
     }
@@ -42,6 +44,36 @@ public class SQLiteConnection {
     public static void logUpload(String filename, String status, String message) {
         logUpload(filename, -1, status, message);
     }
+
+    public static List<UploadLog> getFilesToBackup() {
+        List<UploadLog> filesToBackup = new ArrayList<>();
+        String sql = "SELECT id, filename, filesize, status, message, timestamp " +
+                "FROM upload_logs " +  // Changed from upload_log to upload_logs
+                "WHERE status = 'SUCCESS' " +
+                "ORDER BY timestamp DESC";  // Changed from upload_time to timestamp
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                UploadLog log = new UploadLog(
+                        rs.getInt("id"),
+                        rs.getString("filename"),
+                        rs.getLong("filesize"),  // Changed from size to filesize
+                        rs.getString("status"),
+                        rs.getString("message"),
+                        rs.getString("timestamp")  // Changed from upload_time to timestamp
+                );
+                filesToBackup.add(log);
+            }
+        } catch (SQLException e) {
+            logger.info("Error getting files to backup: " + e.getMessage());
+        }
+
+        return filesToBackup;
+    }
+
 
     public static void logUpload(String filename, long filesize, String status, String message) {
         String sql = "INSERT INTO upload_logs (filename, filesize, status, message) VALUES (?, ?, ?, ?)";
@@ -53,7 +85,7 @@ public class SQLiteConnection {
             pstmt.setString(4, message);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Error logging upload: " + e.getMessage());
+            logger.info("Error logging upload: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -80,7 +112,7 @@ public class SQLiteConnection {
                 logs.add(log);
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving logs: " + e.getMessage());
+            logger.info("Error retrieving logs: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -93,10 +125,25 @@ public class SQLiteConnection {
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
-            System.out.println("All logs cleared");
+            logger.info("All logs cleared");
         } catch (SQLException e) {
-            System.err.println("Error clearing logs: " + e.getMessage());
+            logger.info("Error clearing logs: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    public static void logBackup(int id, String absolutePath, String status, String message) {
+        String sql = "INSERT INTO backup_logs (upload_id, backup_path, status, message) VALUES (?, ?, ?, ?)";
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            pstmt.setString(2, absolutePath);
+            pstmt.setString(3, status);
+            pstmt.setString(4, message);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            logger.info("Error logging backup: " + e.getMessage());
         }
     }
 
