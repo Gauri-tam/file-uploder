@@ -1,6 +1,8 @@
 package org.fileupload.fileuploader;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -23,13 +25,34 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class FileUploaderController {
+
+    private static final Logger logger = Logger.getLogger(FileUploaderController.class.getName());
+
+    static {
+        try {
+            FileHandler fileHandler = new FileHandler("file-uploader.log", true);
+            fileHandler.setFormatter(new SimpleFormatter());
+
+            fileHandler.setFilter(record -> !record.getSourceMethodName().equals("loadExistingFiles"));
+            logger.addHandler(fileHandler);
+            logger.setLevel(Level.ALL);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private ObservableList<File> selectedFiles = FXCollections.observableArrayList();
     private File backupDirectory;
     private Stage primaryStage;
     private final ExecutorService executorService = Executors.newFixedThreadPool(2);
+    private final StringProperty lastBackup = new SimpleStringProperty("Never");
 
     // UI Components
     @FXML private ListView<File> selectedFilesList;
@@ -38,6 +61,7 @@ public class FileUploaderController {
     @FXML private Label progressLabel;
     @FXML private VBox uploadProgressBox;
     @FXML private VBox dropZone;
+    @FXML private Label dropZoneSuccess;
 
     // Backup Components
     @FXML private Label fileLabel;
@@ -51,7 +75,9 @@ public class FileUploaderController {
 
     public void setPrimaryStage(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
+        logger.info("Initializing database connection...");
         SQLiteConnection.initializeDatabase();
+        logger.info("Database initialized. Setting up UI.");
         initializeUI();
     }
 
@@ -77,17 +103,20 @@ public class FileUploaderController {
             }
         });
 
+        lastBackupLabel.setText("Never");
+        lastBackupLabel.textProperty().bind(lastBackup);
         selectedFilesList.setVisible(false);
         uploadProgressBox.setVisible(false);
         backupProgressBox.setVisible(false);
-        lastBackupLabel.setText("Never");
+
         loadExistingFiles();
-        
+
     }
 
     private void loadExistingFiles() {
         List<SQLiteConnection.UploadLog> logs = SQLiteConnection.getRecentLogs(50);
         filesTable.getItems().clear();
+        logger.info("Loading recent upload logs into files table.");
 
         for (SQLiteConnection.UploadLog log : logs) {
             filesTable.getItems().add(new FileRecord(
@@ -102,9 +131,11 @@ public class FileUploaderController {
 
     @FXML
     private void handleChooseFileButton() {
+        logger.info("Opening file chooser dialog...");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Files to Upload");
         List<File> files = fileChooser.showOpenMultipleDialog(primaryStage);
+        logger.info(files == null || files.isEmpty() ? "No files selected." : files.size() + " files selected.");
         updateFileInfo(files);
     }
     private void updateFileInfo(List<File> files) {
@@ -120,9 +151,11 @@ public class FileUploaderController {
     @FXML
     private void handleUploadButton() {
         if (selectedFiles.isEmpty()) {
+            logger.info("Upload button clicked without any files selected.");
             showStatusMessage("Please select files first.", "error");
             return;
         }
+        logger.info("Starting upload of " + selectedFiles.size() + " files.");
 
         uploadProgressBox.setVisible(true);
         progressLabel.setText("Preparing to upload " + selectedFiles.size() + " files...");
@@ -152,6 +185,8 @@ public class FileUploaderController {
                         Thread.sleep(50);
                     }
 
+                    logger.info("Uploading file: " + file.getName());
+
                     // Perform actual upload
                     boolean success = performUpload(file, false);
                     if (success) {
@@ -165,9 +200,11 @@ public class FileUploaderController {
                                     "Completed"
                             ));
                         });
+                        logger.info("Upload successful: " + file.getName());
                     } else {
                         // Retry once if failed
                         success = performUpload(file, true);
+                        logger.warning("Upload failed, retrying: " + file.getName());
                         if (success) {
                             successfulUploads++;
                             Platform.runLater(() -> {
@@ -179,6 +216,7 @@ public class FileUploaderController {
                                         "Completed (retry)"
                                 ));
                             });
+                            logger.info("Retry upload successful: " + file.getName());
                         } else {
                             Platform.runLater(() -> {
                                 filesTable.getItems().add(0, new FileRecord(
@@ -189,6 +227,7 @@ public class FileUploaderController {
                                         "Failed"
                                 ));
                             });
+                            logger.warning("Retry upload failed: " + file.getName());
                         }
                     }
 
@@ -199,6 +238,7 @@ public class FileUploaderController {
                 Platform.runLater(() -> {
                     if (finalSuccessCount == totalFiles) {
                         showStatusMessage("All files uploaded successfully!", "success");
+                        uploadProgressBox.setVisible(false);
                     } else if (finalSuccessCount > 0) {
                         showStatusMessage(String.format("%d of %d files uploaded successfully",
                                 finalSuccessCount, totalFiles), "success");
@@ -226,12 +266,23 @@ public class FileUploaderController {
     private void showStatusMessage(String message, String styleClass) {
         statusLabel.setText(message);
         statusLabel.getStyleClass().removeAll("success", "error");
+        logger.info("Status Message - [" + styleClass.toUpperCase() + "]: " + message);
+
+        if ("success".equals(styleClass)) {
+            statusLabel.setStyle("-fx-text-fill: #2e7d32; -fx-font-weight: bold;");
+        } else if ("error".equals(styleClass)) {
+            statusLabel.setStyle("-fx-text-fill: #d32f2f; -fx-font-weight: bold;");
+        } else {
+            statusLabel.setStyle("");
+        }
+
         statusLabel.getStyleClass().add(styleClass);
     }
 
     private boolean performUpload(File file, boolean isRetry) {
         try {
             boolean success = true; // Set based on actual upload result
+            logger.info((isRetry ? "Retrying upload for: " : "Uploading: ") + file.getName());
             String status = success ? "SUCCESS" : (isRetry ? "RETRY_FAILED" : "FAILED");
             String message = success ? "Upload successful" :
                     (isRetry ? "Retry failed" : "Upload failed");
@@ -260,9 +311,15 @@ public class FileUploaderController {
     @FXML
     private void startManualBackup() {
         if (backupDirectory == null) {
+            logger.info("No backup directory set. Prompting user to select one.");
             chooseBackupDirectory();
-            if (backupDirectory == null) return;
+            if (backupDirectory == null) {
+                logger.warning("Backup canceled. No directory selected.");
+                return;
+            }
         }
+
+        logger.info("Starting manual backup to: " + backupDirectory.getAbsolutePath());
 
         Task<Void> backupTask = new Task<>() {
             @Override
@@ -280,6 +337,8 @@ public class FileUploaderController {
 
                 for (SQLiteConnection.UploadLog file : filesToBackup) {
                     if (isCancelled()) break;
+
+                    logger.info("Backing up file: " + file.getFilename());
 
                     try {
                         backupFile(file);
@@ -302,7 +361,7 @@ public class FileUploaderController {
                     if (!isCancelled()) {
                         backupStatusLabel.setText("Backup completed successfully!");
                         backupStatusLabel.setStyle("-fx-text-fill: #2e7d32;");
-
+                        backupProgressBox.setVisible(false);
                         // Add backup record
                         filesTable.getItems().add(0, new FileRecord(
                                 "Full Backup",
@@ -313,6 +372,8 @@ public class FileUploaderController {
                         ));
                     }
                 });
+
+                logger.info("Backup completed. Files backed up: " + processed + " of " + totalFiles);
 
                 return null;
             }
@@ -366,8 +427,9 @@ public class FileUploaderController {
     @FXML
     private void handleDragOver(DragEvent event) {
         if (event.getDragboard().hasFiles()) {
-            event.acceptTransferModes(TransferMode.COPY);
-            dropZone.setStyle("-fx-border-color: #4a6baf; -fx-background-color: #e6e9f2;");
+            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+            dropZone.setStyle("-fx-border-color: #d1d5db; -fx-padding: 20 10 30 15; -fx-background-color: #f9fafb;");
+            dropZoneSuccess.setText("Add More...");
         }
         event.consume();
     }
@@ -378,21 +440,25 @@ public class FileUploaderController {
         boolean success = false;
 
         if (db.hasFiles()) {
+            // Process the dropped files
+            List<File> files = db.getFiles();
             selectedFiles.addAll(db.getFiles());
             selectedFilesList.setVisible(!selectedFiles.isEmpty());
-            fileLabel.setText(selectedFiles.size() + " files selected");
+                fileLabel.setText(selectedFiles.size() + " files selected");
+
             success = true;
         }
 
-        dropZone.setStyle("-fx-border-color: #d1d5db; -fx-background-color: #f9fafb;");
         event.setDropCompleted(success);
+        dropZone.setStyle("-fx-border-color: #d1d5db; -fx-padding: 20 10 30 15; -fx-background-color: #f9fafb;");
+        dropZoneSuccess.setText("Add More...");
         event.consume();
     }
 
-
     @FXML
     private void handleDragExited(DragEvent event) {
-        dropZone.setStyle("-fx-border-color: #d1d5db; -fx-background-color: #f9fafb;");
+        dropZone.setStyle("-fx-border-color: #d1d5db; -fx-padding: 20 10 30 15; -fx-background-color: #f9fafb;");
+        dropZoneSuccess.setText("Add More...");
         event.consume();
     }
 
