@@ -32,8 +32,22 @@ public class SQLiteConnection {
                 );
                 """;
 
+        String createBackupLogs =
+                """
+                CREATE TABLE IF NOT EXISTS backup_logs (
+                    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                    upload_id   INTEGER NOT NULL,
+                    backup_path TEXT    NOT NULL,
+                    status      TEXT    NOT NULL,
+                    message     TEXT,
+                    timestamp   DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (upload_id) REFERENCES upload_logs(id)
+                );
+                """;
+
         try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
             stmt.execute(createTable);
+            stmt.execute(createBackupLogs);
             initialized = true;
             logger.info("Database initialized successfully");
         } catch (SQLException e) {
