@@ -1,13 +1,13 @@
-package org.fileupload.fileuploader.databaseConnection;
+package org.fileupload.fileuploader.config;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class SQLiteConnection {
+public class SQLiteConnConfig {
 
-    private static final Logger logger = Logger.getLogger(SQLiteConnection.class.getName());
+    private static Logger logger = LoggerConfig.logger;
 
     private static final String DB_URL = "jdbc:sqlite:fileupload.db";
     private static boolean initialized = false;
@@ -74,10 +74,10 @@ public class SQLiteConnection {
                 UploadLog log = new UploadLog(
                         rs.getInt("id"),
                         rs.getString("filename"),
-                        rs.getLong("filesize"),  // Changed from size to filesize
+                        rs.getLong("filesize"),
                         rs.getString("status"),
                         rs.getString("message"),
-                        rs.getString("timestamp")  // Changed from upload_time to timestamp
+                        rs.getString("timestamp")
                 );
                 filesToBackup.add(log);
             }
