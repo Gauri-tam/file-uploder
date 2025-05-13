@@ -16,7 +16,7 @@ public class FileUploader extends Application {
     public void start(Stage primaryStage) throws Exception {
         logger.info("Application Start...");
         FXMLLoader fxmlLoader = new FXMLLoader(FileUploader.class.getResource("file-uploader.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 800, 900);
+        Scene scene = new Scene(fxmlLoader.load(), 1050, 1000);
 
         // Getting the controller and setting the primary stage
         FileUploaderController controller = fxmlLoader.getController();

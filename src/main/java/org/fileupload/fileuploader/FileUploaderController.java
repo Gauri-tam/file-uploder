@@ -6,6 +6,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
@@ -87,7 +88,7 @@ public class FileUploaderController {
         });
 
         lastBackupLabel.setText("Never");
-        lastBackupLabel.textProperty().bind(lastBackup);  // Backup
+        lastBackupLabel.textProperty().bind(lastBackup);
         selectedFilesList.setVisible(false);
         uploadProgressBox.setVisible(false);
         backupProgressBox.setVisible(false);
@@ -128,6 +129,22 @@ public class FileUploaderController {
             statusLabel.setText("");
         } else {
             selectedFilesList.setVisible(false);
+        }
+    }
+
+    @FXML
+    public void handleRemoveFile(ActionEvent actionEvent) {
+        // Get the selected item from the list
+        File selectedFile = selectedFilesList.getSelectionModel().getSelectedItem();
+
+        if (selectedFile != null) {
+            // Remove the file from the list
+            selectedFilesList.getItems().remove(selectedFile);
+
+            // If the list is now empty, hide it
+            if (selectedFilesList.getItems().isEmpty()) {
+                selectedFilesList.setVisible(false);
+            }
         }
     }
 
@@ -372,7 +389,7 @@ public class FileUploaderController {
         });
 
         backupProgress.progressProperty().bind(backupTask.progressProperty());
-        backupStatusLabel.textProperty().bind(backupTask.messageProperty());  // Backup
+        backupStatusLabel.textProperty().bind(backupTask.messageProperty());
 
         executorService.submit(backupTask);
     }
