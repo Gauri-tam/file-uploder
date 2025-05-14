@@ -19,6 +19,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.fileupload.fileuploader.config.LoggerConfig;
 import org.fileupload.fileuploader.config.SQLiteConnConfig;
+import org.fileupload.fileuploader.services.S3Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +39,7 @@ public class FileUploaderController {
     private Stage primaryStage;
     private final ExecutorService executorService = Executors.newFixedThreadPool(2);
     private final StringProperty lastBackup = new SimpleStringProperty("Never");
+    private S3Service s3Service;
 
     // UI Components
     @FXML private ListView<File> selectedFilesList;
@@ -128,20 +130,19 @@ public class FileUploaderController {
             selectedFilesList.setVisible(true);
             statusLabel.setText("");
         } else {
-            selectedFilesList.setVisible(false);
+            selectedFilesList.setVisible(true);
         }
     }
 
     @FXML
     public void handleRemoveFile(ActionEvent actionEvent) {
-        // Get the selected item from the list
+
         File selectedFile = selectedFilesList.getSelectionModel().getSelectedItem();
 
         if (selectedFile != null) {
-            // Remove the file from the list
+
             selectedFilesList.getItems().remove(selectedFile);
 
-            // If the list is now empty, hide it
             if (selectedFilesList.getItems().isEmpty()) {
                 selectedFilesList.setVisible(false);
             }
@@ -306,6 +307,19 @@ public class FileUploaderController {
             return false;
         }
     }
+
+    // uploading all the data on the Amazon s3 Server
+//    private boolean performUpload(File file, boolean retry) {
+//        try {
+//            String s3Key = "uploads/" + file.getName(); // or any custom path
+//            s3Service.uploadFile(file.toPath(), s3Key);
+//            return true;
+//        } catch (Exception e) {
+//            logger.warning("Upload failed for file: " + file.getName() + ". Error: " + e.getMessage());
+//            return false;
+//        }
+//    }
+
 
     // Backup
     @FXML
@@ -481,6 +495,12 @@ public class FileUploaderController {
 
     private String getCurrentDateTime() {
         return java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
+
+    public void setS3Service(S3Service s3Service) {  // I have doubt abut this
+        this.s3Service = s3Service;
+        // use the following when you upload the file
+        // s3Service.uploadFile(Paths.get("path/to/local/file.txt"), "s3-key.txt");
     }
 
 

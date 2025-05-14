@@ -4,93 +4,119 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 
-<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.Group?>
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.fileupload.fileuploader.FileUploaderController"
-      alignment="TOP_CENTER" spacing="20.0" style="-fx-background-color: #f5f7fa; -fx-padding: 20;">
+      alignment="TOP_CENTER"
+      spacing="20"
+      style="-fx-background-color: #f5f7fa; -fx-padding: 30;">
 
-    <!-- Modern Header with App Title, Logo, and Settings Button -->
-    <HBox alignment="CENTER" spacing="15.0" style="-fx-padding: 0 0 10 0;">
+    <!-- Header -->
+    <HBox alignment="CENTER" spacing="10">
         <VBox spacing="0">
-            <Label text="FILE UPLOADER" style="-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: #4a6baf;"/>
-            <Label text="Secure Cloud Backup" style="-fx-font-size: 12; -fx-text-fill: #666;"/>
+            <Label text="FILE UPLOADER" style="-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #4a6baf;" />
+            <Label text="Secure Cloud Backup" style="-fx-font-size: 12; -fx-text-fill: #666;" />
         </VBox>
-        <Region HBox.hgrow="ALWAYS"/>
+        <Region HBox.hgrow="ALWAYS" />
     </HBox>
 
-    <!-- Modern File Upload Card with Drag & Drop Support -->
-    <VBox style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 2);"
-          alignment="CENTER" spacing="20" maxWidth="600">
-<!--        <Label text="Upload Files" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: #333;"/>-->
+    <!-- File Uploader Card -->
+    <VBox alignment="CENTER" spacing="20"
+          style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 2);"
+          maxWidth="800">
 
         <!-- Drag & Drop Zone -->
         <VBox fx:id="dropZone" alignment="CENTER" spacing="15"
-              style="-fx-border-color: #d1d5db; -fx-padding: 20 10 30 15; -fx-border-style: dashed; -fx-border-radius: 8; -fx-background-color: #f9fafb; -fx-background-radius: 8;"
-              onDragOver="#handleDragOver" onDragDropped="#handleDragDropped" onDragExited="#handleDragExited"
-              maxWidth="550" >
-            <Label text="Drag and Drop files here" style="-fx-font-size: 16; -fx-text-fill: #6b7280;"/>
-            <Label text="or" style="-fx-font-size: 14; -fx-text-fill: #9ca3af;"/>
+              style="-fx-border-color: #d1d5db; -fx-padding: 30 15 30 15; -fx-border-style: dashed; -fx-border-radius: 8; -fx-background-color: #f9fafb; -fx-background-radius: 8;"
+              onDragOver="#handleDragOver" onDragDropped="#handleDragDropped" onDragExited="#handleDragExited">
+
+            <VBox  alignment="CENTER" spacing="15">
+                <Group>
+                    <SVGPath content="M6.5,28.5c-3.309,0-6-2.691-6-6s2.691-6,6-6c0.497,0,1.011,0.068,1.529,0.204l0.494,0.13 l0.119-0.497c0.423-1.771,1.775-3.17,3.53-3.652l0.332-0.092l0.034-0.341C12.919,8.402,16.127,5.5,20,5.5 c2.859,0,5.43,1.596,6.709,4.165l0.204,0.408l0.425-0.165C28.037,9.638,28.765,9.5,29.5,9.5c3.309,0,6,2.691,6,6 c0,0.271-0.024,0.556-0.075,0.896l-0.058,0.391l0.366,0.147c2.288,0.919,3.767,3.104,3.767,5.565c0,3.309-2.691,6-6,6H6.5z" fill="#ffffff"/>
+                    <SVGPath content="M20,6c2.668,0,5.068,1.49,6.262,3.888l0.406,0.816l0.85-0.329C28.161,10.126,28.828,10,29.5,10 c3.033,0,5.5,2.467,5.5,5.5c0,0.247-0.022,0.508-0.069,0.822l-0.117,0.782l0.734,0.295C37.645,18.241,39,20.244,39,22.5 c0,3.033-2.467,5.5-5.5,5.5h-27C3.467,28,1,25.533,1,22.5S3.467,17,6.5,17c0.455,0,0.927,0.063,1.401,0.188l0.99,0.26l0.237-0.995 c0.38-1.593,1.598-2.852,3.177-3.287l0.662-0.182l0.068-0.683C13.391,8.709,16.385,6,20,6 M20,5c-4.149,0-7.559,3.159-7.96,7.202 c-1.922,0.529-3.42,2.071-3.885,4.019C7.626,16.082,7.073,16,6.5,16C2.91,16,0,18.91,0,22.5S2.91,29,6.5,29c3.43,0,23.41,0,27,0 s6.5-2.91,6.5-6.5c0-2.734-1.69-5.069-4.08-6.03c0.048-0.317,0.08-0.64,0.08-0.97c0-3.59-2.91-6.5-6.5-6.5 c-0.827,0-1.615,0.161-2.343,0.442C25.847,6.812,23.138,5,20,5L20,5z" fill="#7496c4"/>
+                    <SVGPath content="M17 27H23V29H17z" fill="#c2e8ff"/>
+                    <SVGPath content="M19 21L19 35 21 35 21 21 26 21 20 15 14 21z" fill="#4e7ab5"/>
+                </Group>
+            </VBox>
+            <Label text="Drag and Drop files here" style="-fx-font-size: 16; -fx-text-fill: #6b7280;" />
+            <Label text="or" style="-fx-font-size: 14; -fx-text-fill: #9ca3af;" />
             <Button text="Browse Files" onAction="#handleChooseFileButton"
-                    style="-fx-background-color: #4a6baf; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 6;"/>
-            <Label fx:id="dropZoneSuccess" style="-fx-font-weight: bold; -fx-text-fill: #4a6baf;"/>
+                    style="-fx-background-color: #4a6baf; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 6;" />
+            <Label fx:id="dropZoneSuccess" style="-fx-font-weight: bold; -fx-text-fill: #4a6baf;" />
         </VBox>
 
-        <!-- Selected Files List -->
+        <!-- File List -->
         <ListView fx:id="selectedFilesList" visible="false"
                   style="-fx-background-color: #f3f4f6; -fx-background-radius: 8;"
-                  maxWidth="550" maxHeight="100"
-                  styleClass="files-list-view"/>
+                  maxHeight="100">
+            <contextMenu>
+                <ContextMenu fx:id="listContextMenu"
+                             style="-fx-padding: 5; -fx-background-color: white; -fx-background-radius: 4; -fx-border-radius: 8; -fx-border-color: #e5e7eb; -fx-border-width: 1;">
+                    <items>
+                        <MenuItem text="Remove" onAction="#handleRemoveFile" />
+                    </items>
+                </ContextMenu>
+            </contextMenu>
+        </ListView>
 
         <!-- Action Buttons -->
         <HBox alignment="CENTER" spacing="15">
             <Button text="Upload All Files" onAction="#handleUploadButton"
-                    style="-fx-background-color: linear-gradient(to right, #4a6baf, #3b5998); -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 25; -fx-background-radius: 6; -fx-effect: dropshadow(three-pass-box, rgba(74,107,175,0.3), 5, 0, 0, 2);"/>
+                    style="-fx-background-color: linear-gradient(to right, #4a6baf, #3b5998); -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 25; -fx-background-radius: 6;" />
             <Button fx:id="backupNowButtonid" text="Backup Now" onAction="#startManualBackup"
-                    style="-fx-background-color: linear-gradient(to right, #2e7d32, #1b5e20); -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 25; -fx-background-radius: 6; -fx-effect: dropshadow(three-pass-box, rgba(46,125,50,0.3), 5, 0, 0, 2);"/>
+                    style="-fx-background-color: linear-gradient(to right, #2e7d32, #1b5e20); -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 25; -fx-background-radius: 6;" />
         </HBox>
 
         <!-- Status Indicators -->
         <VBox alignment="CENTER" spacing="10">
             <HBox alignment="CENTER" spacing="10">
-                <Label text="Last Backup:" style="-fx-font-weight: bold; -fx-text-fill: #4b5563;"/>
-                <Label fx:id="lastBackupLabel" text="Never" style="-fx-text-fill: #6b7280;"/>
+                <Label text="Last Backup:" style="-fx-font-weight: bold; -fx-text-fill: #4b5563;" />
+                <Label fx:id="lastBackupLabel" text="Never" style="-fx-text-fill: #6b7280;" />
             </HBox>
 
-            <VBox fx:id="backupProgressBox" visible="false" spacing="8" alignment="CENTER" style="-fx-padding: 10 0;">
-                <ProgressBar fx:id="backupProgress" maxWidth="400" style="-fx-accent: #4a6baf; -fx-background-radius: 3; -fx-border-radius: 3;"/>
-                <Label fx:id="backupStatusLabel" style="-fx-text-fill: #4b5563; -fx-font-size: 13;"/>
+            <VBox fx:id="backupProgressBox" visible="false" spacing="8" alignment="CENTER">
+                <ProgressBar fx:id="backupProgress" maxWidth="400"
+                             style="-fx-accent: #4a6baf; -fx-background-radius: 3; -fx-border-radius: 3;" />
+                <Label fx:id="backupStatusLabel" style="-fx-text-fill: #4b5563; -fx-font-size: 13;" />
             </VBox>
 
-            <VBox fx:id="uploadProgressBox" visible="false" spacing="8" alignment="CENTER" style="-fx-padding: 10 0;">
-                <ProgressBar fx:id="uploadProgress" maxWidth="400" style="-fx-accent: #4a6baf; -fx-background-radius: 3; -fx-border-radius: 3;"/>
-                <Label fx:id="progressLabel" text="Uploading..." style="-fx-text-fill: #4a6baf; -fx-font-weight: bold;"/>
+            <VBox fx:id="uploadProgressBox" visible="false" spacing="4" alignment="CENTER">
+                <ProgressBar fx:id="uploadProgress" maxWidth="400"
+                             style="-fx-accent: #4a6baf; -fx-background-radius: 3; -fx-border-radius: 3;" />
+                <Label fx:id="progressLabel" text="Uploading..." style="-fx-text-fill: #4a6baf; -fx-font-weight: bold;" />
             </VBox>
 
-            <Label fx:id="statusLabel" style="-fx-font-weight: bold; -fx-text-fill: #d32f2f;"/>
+            <Label fx:id="statusLabel" style="-fx-font-weight: bold; -fx-text-fill: #d32f2f;" />
         </VBox>
     </VBox>
 
-    <!-- Recently Backed Up/Uploaded Files Section -->
-    <TableView fx:id="filesTable" maxHeight="200" style="-fx-background-insets: 0;">
-        <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-        </columnResizePolicy>
-        <columns>
-            <TableColumn text="File Name" prefWidth="150">
-                <cellValueFactory><PropertyValueFactory property="name"/></cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Size" prefWidth="80">
-                <cellValueFactory><PropertyValueFactory property="size"/></cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Date" prefWidth="120">
-                <cellValueFactory><PropertyValueFactory property="date"/></cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Type" prefWidth="80">
-                <cellValueFactory><PropertyValueFactory property="type"/></cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Status" prefWidth="70">
-                <cellValueFactory><PropertyValueFactory property="status"/></cellValueFactory>
-            </TableColumn>
-        </columns>
-    </TableView>
-
+    <!-- Recent Uploads -->
+    <VBox alignment="CENTER" spacing="15" maxWidth="800"
+          style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 2);">
+        <Label text="Recent Uploads" style="-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #333;" />
+        <TableView fx:id="filesTable" maxHeight="200" style="-fx-background-insets: 0;">
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+            <columns>
+                <TableColumn text="File Name" prefWidth="150">
+                    <cellValueFactory><PropertyValueFactory property="name" /></cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Size" prefWidth="80">
+                    <cellValueFactory><PropertyValueFactory property="size" /></cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Date" prefWidth="120">
+                    <cellValueFactory><PropertyValueFactory property="date" /></cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Type" prefWidth="80">
+                    <cellValueFactory><PropertyValueFactory property="type" /></cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Status" prefWidth="70">
+                    <cellValueFactory><PropertyValueFactory property="status" /></cellValueFactory>
+                </TableColumn>
+            </columns>
+        </TableView>
+    </VBox>
 </VBox>
