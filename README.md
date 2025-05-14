@@ -10,6 +10,7 @@ Implement a background service to collect data automatically from local machines
 
 **4. Cloud Service Integration (Serverless API)**
 Build lightweight serverless APIs using AWS Lambda or Azure Functions for tasks such as file metadata tracking, connectivity testing, and cloud interaction. Helps support automation without full backend setup.
+
 ----------------------------------------------------------------------------
 **for running the Application**
 1. run the **mvn clean install** to create .jar file on the terminal
