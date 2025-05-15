@@ -9,7 +9,9 @@ public class SQLiteConnConfig {
 
     private static Logger logger = LoggerConfig.logger;
 
-    private static final String DB_URL = "jdbc:sqlite:fileupload.db";
+    //    private static final String DB_URL = "jdbc:sqlite:fileupload.db"; // use it for the locale
+    private static final String DB_URL = "jdbc:sqlite:" + System.getProperty("user.home") + "/fileupload.db";
+
     private static boolean initialized = false;
 
     public static Connection getConnection() throws SQLException {
